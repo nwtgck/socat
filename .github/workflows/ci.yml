@@ -1,0 +1,22 @@
+name: CI
+
+on: [push, pull_request]
+
+jobs:
+  build_on_mac:
+    runs-on: macos-10.15
+    steps:
+    - uses: actions/checkout@v2
+    - name: Configure
+      run: |
+        set -xeu
+        export PATH="/usr/local/opt/openssl/bin:$PATH"
+        export LDFLAGS="-L/usr/local/opt/openssl/lib"
+        export CPPFLAGS="-I/usr/local/opt/openssl/include"
+        export PYCURL_SSL_LIBRARY=openssl
+        ./configure        
+    - name: Build
+      # Why not just "make"? → Because "yodl2man" command needed
+      run: make progs
+    # Simple test
+    - run: ./socat -V
